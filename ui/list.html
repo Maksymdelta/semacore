@@ -1,0 +1,20 @@
+
+<div id="wrapper">
+
+        <check if="{{ isset(@list) }}">
+            <repeat group="{{ @list }}" value="{{ @entity }}">
+                entity: {{ @entity->getUid() }} {{ @entity->getName() }}<br />
+                <check if="{{ @entity->getInfo_bits()!=null }}">
+                    <F3:set infobits="{{@entity->getInfo_bits()}}" />
+
+                <repeat group="{{@infobits}}" value="{{ @infobit }}">
+                infobits: {{ @infobit->getKey() }} - {{ @infobit->getValue() }}
+                </repeat>
+                </check>
+            </repeat>
+        </check>
+
+</div>
+
+</body>
+</html>

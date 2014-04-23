@@ -1,0 +1,15 @@
+#wrapper{width: 1024px;margin: auto;padding-top: 70px;}
+.field, .actions {
+    margin-bottom: 15px;
+}
+.field label {
+    float: left;
+    text-align: left;
+    padding-right: 10px;
+    margin: 5px 0px 5px 0px;
+    width: 100px;
+}
+
+.clear{clear: both;}
+
+#addnew div.bootstrap-select{width: 290px;}

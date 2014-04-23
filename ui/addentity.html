@@ -1,0 +1,95 @@
+<include href="'../'.{{ @UI }}.'header.html'" />
+<exclude><include href="'../'.'/'.{{ @UI }}.'topmenu.html'" /></exclude>
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#addnew').idealforms();
+        $('.selectpicker').selectpicker();
+//        $('#select1 div.bootstrap-select .dropdown-menu li').click(function(e){
+//            //get the selectedIndex from the li element
+//            var selectedIndex = $(e.currentTarget).attr('rel');
+//            //The the option's value based on the selectedIndex
+//            var val = $('select#object option:eq(' + selectedIndex + ')').attr('value');
+//            $('#selobject1').val(val);
+//        });
+
+        $('#add').click(function(){
+
+            if($('#addnew').idealforms('get:invalid').length==0)
+            {
+                $( "#addnew" ).submit();
+            }
+            else{
+                $('#addnew').idealforms('focusFirstInvalid');
+            }
+        });
+
+    });
+</script>
+
+<div id="wrapper">
+    <check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+    <form id="addnew" name="addnew" action="{{@ALIASES.doaddentity}}" class="idealforms" method="post">
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Додати сутність</div>
+            <div class="panel-body">
+                <div class="field">
+                    <label for="name">Ім'я об'єкту</label>
+                    <input data-idealforms-rules="required" placeholder="Ім'я об'єкту" required="required" type="text" name="name" id="name" />
+                    <span class="error"></span>
+                    <i class="icon"></i>
+                </div>
+
+                <check if="{{ isset(@types) }}">
+                    <div class="field">
+                        <label for="type">Тип</label>
+                        <select name="type" id="type" class="selectpicker">
+                            <option value="none" selected>Виберіть тип</option>
+                            <repeat group="{{ @types }}" value="{{ @type }}">
+                                <option value="{{ @type }}">{{@type}}</option>
+                            </repeat>
+
+                        </select>
+                    </div>
+                </check>
+
+                <check if="{{ isset(@classes) }}">
+                    <div class="field">
+                        <label for="type">Класи</label>
+                        <select name="class[]" id="class" class="selectpicker" multiple title="Виберіть клас">
+                            <repeat group="{{ @classes }}" value="{{ @class }}">
+                                <option value="{{ @class }}">{{@class}}</option>
+                            </repeat>
+
+                        </select>
+                    </div>
+                </check>
+                <div class="field">
+                    <label for="description">Опис</label>
+                        <textarea id="description" name="description" placeholder="Опис"></textarea>
+                    </div>
+
+                <div class="field">
+                    <textarea name="infobit" id="infobit"></textarea>
+                </div>
+                <div class="field">
+                    <textarea name="infobitvalue" id="infobitvalue"></textarea>
+                </div>
+
+
+                <div class="field">
+                    <button class="btn btn-default" type="button" id="add" name="add">Додати</button>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+</body>
+</html>
