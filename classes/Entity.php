@@ -10,6 +10,7 @@ class Entity extends Object
 
 	private $Classes;
     private $Description;
+    private $Relationships;
     protected $node;
 
 	public function getClasses()
@@ -49,6 +50,18 @@ class Entity extends Object
         $mapper->attach($this->Classes,'Class');
         $mapper->attach($this->Description,'description');
         parent::injectMapper($mapper);
+    }
+
+    function getRelationships()
+    {
+        if($this->Neo4jObject!=null&&$this->Relationships==null)
+        {
+           foreach($this->Neo4jObject->getRelationships as $rel)
+           {
+               $this->Relationships[]=new Relationship($rel->getId());
+           }
+        }
+        return $this->Relationships;
     }
 
     function __construct($id=null)

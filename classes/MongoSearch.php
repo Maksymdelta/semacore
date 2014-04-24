@@ -1,7 +1,7 @@
 <?php
 
 
-class MongoSearch implements SearchInterface{
+class MongoSearch {
 
     protected static $db;
     protected static $server;
@@ -23,26 +23,30 @@ class MongoSearch implements SearchInterface{
         return self::$instance;
     }
 
-    function search(MongoMappable $object, array $filter)
+    /**
+     * @param array $mappableArray Array of MongoMappable objects to find
+     * @param array $filter
+     * @param array $options
+     * @return array|bool
+     */
+    function search(array $mappableArray,array $filter=null,array $options=null)
     {
-
-    }
-
-    function getList(MongoMappable $mappable,$options=null)
-    {
-        $objType=$mappable->__toString();
-        $obj=new DB\Mongo\Mapper(self::$db,$objType);
-        $objList=$obj->find(null,$options);
         $result=array();
-        if(count($objList)>0)
+        foreach($mappableArray as $mappable)
         {
-            foreach($objList as $object)
+            $objType=$mappable->__toString();
+            $obj=new DB\Mongo\Mapper(self::$db,$objType);
+            $objList=$obj->find($filter,$options);
+            if(count($objList)>0)
             {
-                $obj=new $objType((string)$object->_id);
-                if($obj->getUid())$result[]=$obj;
+                foreach($objList as $object)
+                {
+                    $obj=new $objType((string)$object->_id);
+                    if($obj->getUid())$result[]=$obj;
+                }
             }
-            return $result;
         }
-        return false;
+        return $result;
+
     }
 }

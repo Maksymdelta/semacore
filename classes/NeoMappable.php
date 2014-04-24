@@ -21,6 +21,8 @@ interface NeoMappable
 
 	public function getUid();
 
+    public function delete();
+
     public function getNeo4jObject();
     public function setNeo4jObject(Everyman\Neo4j\PropertyContainer $obj);
 

@@ -17,6 +17,7 @@ class Neo4jMapper
 
     protected $attached = array();
     protected $client;
+    protected $index;
 
 
     function  __construct()
@@ -24,13 +25,21 @@ class Neo4jMapper
         if(!F3::get('neo4jserver')||!F3::get('neo4jport'))throw new Exception('No data source provided!');
         $this->client = new Client(F3::get('neo4jserver'), F3::get('neo4jport'));
     }
-	/**
-	 * 
-	 * @param Mappable
-	 */
-	public function load(NeoMappable $Mappable)
-	{
-	}
+    /**
+     *
+     * @param Mappable
+     */
+    public function load(NeoMappable $Mappable, $id)
+    {
+        $match = $this->index->findOne('Uid', (string)$id);
+        if($match!=null)
+        {
+            $Mappable->setNeo4jObject($match);
+            return true;
+        }
+    }
+
+
 
 	public function save(NeoMappable $Mappable)
 	{
@@ -40,7 +49,15 @@ class Neo4jMapper
                 if($value!=null)$object->setProperty($fieldname, $value);
             }
             $object->save();
+            $this->addUidToIndex($object);
 	}
+
+
+    protected function addUidToIndex($Neo4jObject)
+    {
+
+        $this->index->add($Neo4jObject, 'Uid', $Neo4jObject->getProperty('Uid'));
+    }
 
 	public function update()
 	{

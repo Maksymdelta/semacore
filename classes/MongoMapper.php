@@ -48,8 +48,7 @@ class MongoMapper
         $obj=new DB\Mongo\Mapper($this->db,$mappable->__toString());
         $obj->load(array('_id'=>new \MongoId($id)));
         if($obj->dry())return false;
-        $obj->erase();
-        return true;
+        return $obj->erase();
     }
 
 	public function save(MongoMappable $mappable)

@@ -48,6 +48,14 @@ class InfoBit implements MongoMappable{
         return true;
     }
 
+    function delete()
+    {
+        if($this->getUid())
+        {
+        $this->MongoMapper->delete($this,$this->getUid());
+        }
+    }
+
     public function update()
     {
         $this->MongoMapper->update($this);

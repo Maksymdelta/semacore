@@ -1,15 +1,31 @@
-
+<include href="'../'.{{ @UI }}.'header.html'" />
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#search').click(function(){
+            $( "#searchform" ).submit();
+        });
+    });
+</script>
 <div id="wrapper">
+    <form id="searchform" action="{{@ALIASES.listsearch}}" method="post">
+
+        <div class="input-group">
+            <input id="request" name="request" type="text" class="form-control">
+
+            <span style="cursor: pointer;" id="search" class="input-group-addon">Пошук</span>
+        </div>
+    </form>
+
 
         <check if="{{ isset(@list) }}">
             <repeat group="{{ @list }}" value="{{ @entity }}">
-                entity: {{ @entity->getUid() }} {{ @entity->getName() }}<br />
+                entity: {{ @entity->getUid() }} {{ @entity->getName() }} {{ @entity->getObjType() }}<br />
                 <check if="{{ @entity->getInfo_bits()!=null }}">
                     <F3:set infobits="{{@entity->getInfo_bits()}}" />
 
                 <repeat group="{{@infobits}}" value="{{ @infobit }}">
                 infobits: {{ @infobit->getKey() }} - {{ @infobit->getValue() }}
-                </repeat>
+                </repeat><br />
                 </check>
             </repeat>
         </check>

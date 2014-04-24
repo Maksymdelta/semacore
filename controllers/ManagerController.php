@@ -2,19 +2,29 @@
 
 
 class ManagerController extends baseController{
-    function listEntity($f3)
+    function listObjects($f3)
     {
-        if($result=MongoSearch::getInstance()->getList(new Entity()))
+        if($request=$f3->get('SESSION.request'))
         {
+            $result=MongoSearch::getInstance()->search(array(new Entity(),new Relationship()),array('name'=>array('$in'=>[new \MongoRegex('/'.$request.'/i'),'$exists'=>true])));
             $f3->set('list',$result);
         }
+        $f3->set('head','../'.$f3->get('UI').'list_head.html');
         echo Template::instance($f3)->render('../'.$f3->get('UI').'list.html');
+        $f3->clear('SESSION.request');
+    }
+
+    function listSearch($f3)
+    {
+        if(!$f3->get('POST.request'))$f3->reroute('@list');
+        $f3->set('SESSION.request',$f3->get('POST.request'));
+        $f3->reroute('@list');
     }
 
     function addEntity($f3)
     {
         $f3->set('head','../'.$f3->get('UI').'addentity_head.html');
-        $f3->set('types',RelationType::getTypes());
+        $f3->set('types',EntityType::getTypes());
         $f3->set('classes',EntityClass::getClasses());
         echo Template::instance($f3)->render('../'.$f3->get('UI').'addentity.html');
     }

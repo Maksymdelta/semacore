@@ -10,7 +10,8 @@ $f3->set('CACHE', true);
 require('lib/vendor/autoload.php');
 $f3->config('config.ini');
 
-$f3->route('GET @entitylist: /manager/entity/list','ManagerController->listEntity');
+$f3->route('GET @list: /manager/entity/list','ManagerController->listObjects');
+$f3->route('POST @listsearch: /manager/search','ManagerController->listSearch');
 $f3->route('GET @entityadd: /manager/entity/add','ManagerController->addEntity');
 $f3->route('POST @doaddentity: /manager/entity/add','ManagerController->doAddEntity');
 

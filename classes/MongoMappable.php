@@ -21,6 +21,7 @@ interface MongoMappable
 
 	public function getUid();
 
+    public function delete();
 
 	/**
 	 * 

@@ -35,6 +35,7 @@ abstract class Object implements MongoMappable,NeoMappable
         }
 	}
 
+
     function setNeo4jObject(Everyman\Neo4j\PropertyContainer $obj)
     {
         $this->Neo4jObject=$obj;
@@ -50,10 +51,33 @@ abstract class Object implements MongoMappable,NeoMappable
        {
            $this->setUid($id);
            if($this->Created_by_id!=null)$this->setCreated_by(new User($this->Created_by_id));
+           try{
+               $this->Neo4jMapper->load($this,$id);
+           }
+           catch(Exception $e){
+               return false;
+           }
            return true;
        }
         return false;
 	}
+
+    public function delete()
+    {
+        if($this->getUid())
+        {
+            if($this->getInfo_bits())
+            {
+                foreach($this->getInfo_bits() as $infobit)
+                {
+                    $infobit->delete();
+                }
+            }
+            $this->Neo4jMapper->delete($this,$this->getUid());
+            $this->MongoMapper->delete($this,$this->getUid());
+        }
+
+    }
 
 	public function save()
 	{
@@ -131,6 +155,7 @@ abstract class Object implements MongoMappable,NeoMappable
 
 	public function getObjType()
 	{
+        if($this->Type==null&&$this->Neo4jObject!=null)$this->Type=$this->Neo4jObject->getProperty('type');
 		return $this->Type;
 	}
 
