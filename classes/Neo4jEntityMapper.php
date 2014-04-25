@@ -5,12 +5,12 @@ class Neo4jEntityMapper extends Neo4jMapper{
 
     public function save(NeoMappable $Mappable)
     {
-        if($entity->getNeo4jObject()==null)
+        if($Mappable->getNeo4jObject()==null)
         {
-            $entity->setNeo4jObject($this->client->makeNode());
+            $Mappable->setNeo4jObject($this->client->makeNode());
 
         }
-        parent::save($entity);
+        parent::save($Mappable);
 
     }
 

@@ -54,7 +54,7 @@ class Entity extends Object
 
     function getRelationships()
     {
-        if($this->Neo4jObject!=null&&$this->Relationships==null)
+        if($this->Neo4jObject!=null&&$this->Relationships!=null)
         {
            foreach($this->Neo4jObject->getRelationships as $rel)
            {
