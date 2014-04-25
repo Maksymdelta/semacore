@@ -1,0 +1,19 @@
+<ul class="nav nav-tabs">
+    <check if="{{ F3::get('SERVER.REQUEST_URI')==@ALIASES.list }}">
+        <true>
+            <li class="active"><a href="{{@ALIASES.list}}">Існуючі сутності</a></li>
+        </true>
+        <false>
+            <li><a href="{{@ALIASES.list}}">Існуючі сутності</a></li>
+        </false>
+    </check>
+    <check if="{{ F3::get('SERVER.REQUEST_URI')==@ALIASES.entityadd }}">
+        <true>
+            <li class="active"><a href="{{@ALIASES.entityadd}}">Додати сутність</a></li>
+        </true>
+        <false>
+            <li><a href="{{@ALIASES.entityadd}}">Додати сутність</a></li>
+        </false>
+    </check>
+</ul>
+

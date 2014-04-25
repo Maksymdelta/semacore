@@ -1,5 +1,5 @@
 <include href="'../'.{{ @UI }}.'header.html'" />
-<exclude><include href="'../'.'/'.{{ @UI }}.'topmenu.html'" /></exclude>
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
 <script type="text/javascript">
     $(window).on('load', function () {
         $('#addnew').idealforms();
@@ -67,15 +67,11 @@
                 </check>
                 <div class="field">
                     <label for="description">Опис</label>
-                        <textarea id="description" name="description" placeholder="Опис"></textarea>
+                        <textarea data-idealforms-rules="required"id="description" name="description" placeholder="Опис"></textarea>
+                    <span class="error"></span>
+                    <i class="icon"></i>
                     </div>
 
-                <div class="field">
-                    <textarea name="infobit" id="infobit"></textarea>
-                </div>
-                <div class="field">
-                    <textarea name="infobitvalue" id="infobitvalue"></textarea>
-                </div>
 
 
                 <div class="field">

@@ -13,3 +13,10 @@
 .clear{clear: both;}
 
 #addnew div.bootstrap-select{width: 290px;}
+#objtablewrapper{margin-top: 40px;}
+#objtable tr:hover{cursor: pointer;}
+table .row_selected td {
+    background-color: #9FAFD1;
+}
+#btnsadd{padding-top: 40px;width: 600px;margin: auto;}
+#btnsadd .btn{margin-left: 60px;}

@@ -1,12 +1,88 @@
 <include href="'../'.{{ @UI }}.'header.html'" />
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
 <script type="text/javascript">
     $(window).on('load', function () {
         $('#search').click(function(){
             $( "#searchform" ).submit();
         });
+       <check if="{{ isset(@aaData) }}">
+        $('#objtable').dataTable( {
+            "bLengthChange": false,
+            "aaData": {{@aaData|raw}},
+            "bFilter": false,
+            "bSort": false,
+            "bInfo": false,
+            "oLanguage": {
+                "sEmptyTable": "Нема данних",
+                "sSearch": "Фільтр:",
+                "oPaginate": {
+                    "sFirst": "Перша",
+                    "sNext": "Наступна",
+                    "sPrevious": "Попередня"
+                            }
+                        }
+        } );
+        var oTable;
+        $("#objtable tbody tr").click( function( e ) {
+            if ( $(this).hasClass('row_selected') ) {
+                $(this).removeClass('row_selected');
+            }
+            else {
+                oTable.$('tr.row_selected').removeClass('row_selected');
+                $(this).addClass('row_selected');
+            }
+        });
+        oTable = $('#objtable').dataTable( );
+    </check>
+        $('#edit').click(function(){
+            editObject();
+        });
+        $('#delete').click(function(){
+            deleteObject();
+        });
+
+        $('#add').click(function(){
+            $(location).attr('href',"{{@ALIASES.entityadd}}");
+        });
+        $('#addrelationship').click(function(){
+            $(location).attr('href',"{{@ALIASES.relationshipadd}}");
+        });
+
+
     });
+    function editObject()
+    {
+        var id=$('tr.row_selected').attr('id');
+        if(id==undefined)
+        {
+            alert('Спочатку виберіть об\'єкт!');
+            return;
+        }
+        idObjArray=id.split("|");
+        $(location).attr('href',"/manager/editobject/"+idObjArray[0]+"/"+idObjArray[1]);
+    }
+
+    function deleteObject()
+    {
+        var id=$('tr.row_selected').attr('id');
+        if(id==undefined)
+        {
+            alert('Спочатку виберіть об\'єкт!');
+            return;
+        }
+        var r=confirm("Ви дійсно хочете видалити цей об\'єкт?");
+        if (r==true)
+        {
+            idObjArray=id.split("|");
+            $(location).attr('href',"/manager/deleteobject/"+idObjArray[0]+"/"+idObjArray[1]);
+        }
+    }
 </script>
+
 <div id="wrapper">
+    <div class="panel panel-default">
+        <div class="panel-heading">Існуючі сутності</div>
+        <div class="panel-body">
     <form id="searchform" action="{{@ALIASES.listsearch}}" method="post">
 
         <div class="input-group">
@@ -15,22 +91,43 @@
             <span style="cursor: pointer;" id="search" class="input-group-addon">Пошук</span>
         </div>
     </form>
+            <check if="{{ isset(@aaData) }}">
+    <div id="objtablewrapper">
+        <table id="objtable">
 
+        <thead>
+        <tr>
+            <th width="15%">Об'єкт</th>
+            <th width="45%">Ім'я</th>
+            <th width="25%">Тип</th>
+            <th width="15%">Додано</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td colspan="4" class="dataTables_empty">Loading data from server</td>
+        </tr>
+        </tbody>
 
-        <check if="{{ isset(@list) }}">
-            <repeat group="{{ @list }}" value="{{ @entity }}">
-                entity: {{ @entity->getUid() }} {{ @entity->getName() }} {{ @entity->getObjType() }}<br />
-                <check if="{{ @entity->getInfo_bits()!=null }}">
-                    <F3:set infobits="{{@entity->getInfo_bits()}}" />
-
-                <repeat group="{{@infobits}}" value="{{ @infobit }}">
-                infobits: {{ @infobit->getKey() }} - {{ @infobit->getValue() }}
-                </repeat><br />
+    </table>
+    </div>
                 </check>
-            </repeat>
-        </check>
+
+    <div class="btn-group-xs" style="margin-top: 4px;">
+        <button id="edit" type="button" class="btn btn-default">Редагувати</button>
+        <button id="delete" type="button" class="btn btn-default">Видалити</button>
+        </div>
+<div id="btnsadd">
+    <div class="btn-group-lg">
+        <button id="add" type="button" class="btn btn-default">Додати сутність</button>
+        <button id="relationship" type="button" class="btn btn-default">Додати зв'язок</button>
+    </div>
+</div>
 
 </div>
+        </div>
+    </div>
+
 
 </body>
 </html>
