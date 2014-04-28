@@ -65,13 +65,23 @@
                         </select>
                     </div>
                 </check>
-                <div class="field">
-                    <label for="description">Опис</label>
-                        <textarea data-idealforms-rules="required"id="description" name="description" placeholder="Опис"></textarea>
-                    <span class="error"></span>
-                    <i class="icon"></i>
-                    </div>
 
+
+                <div class="clear">
+
+                    <fieldset class="border">
+                        <legend class="border">Опис</legend>
+
+                        <div class="field">
+                            <textarea data-idealforms-rules="required"id="description" name="description" placeholder="Опис"><check if="{{ isset(@entity)}}">{{ @entity->getDescription()}}</check></textarea>
+                            <span class="error"></span>
+                            <i class="icon"></i>
+                        </div>
+                    </fieldset>
+                </div>
+
+
+            </div>
 
 
                 <div class="field">

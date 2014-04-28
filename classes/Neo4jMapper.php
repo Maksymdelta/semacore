@@ -43,7 +43,7 @@ class Neo4jMapper
 
 	public function save(NeoMappable $Mappable)
 	{
-       $object=$Mappable->getNeo4jObject();
+            $object=$Mappable->getNeo4jObject();
             foreach($this->fromDomainObject() as $fieldname=>$value)
             {
                 if($value!=null)$object->setProperty($fieldname, $value);
@@ -59,8 +59,15 @@ class Neo4jMapper
         $this->index->add($Neo4jObject, 'Uid', $Neo4jObject->getProperty('Uid'));
     }
 
-	public function update()
+	public function update(NeoMappable $Mappable)
 	{
+        $object=$Mappable->getNeo4jObject();
+        foreach($this->fromDomainObject() as $fieldname=>$value)
+        {
+            $object->removeProperty($fieldname);
+            if($value!=null)$object->setProperty($fieldname, $value);
+        }
+        $object->save();
 	}
 
 

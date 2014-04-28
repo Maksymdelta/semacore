@@ -11,11 +11,13 @@ require('lib/vendor/autoload.php');
 $f3->config('config.ini');
 
 $f3->route('GET @list: /manager/list','ManagerController->listObjects');
-$f3->route('GET @ajaxlist: /manager/list [ajax]','ManagerController->ajaxListObjects');
+$f3->route('POST @addinfobit: /manager/entity/addinfobit','ManagerController->addInfobitToEntity');
+$f3->route('GET @deleteinfobit: /manager/entity/@entityid/deleteinfobit/@infobitid','ManagerController->deleteInfobitFromEntity');
 $f3->route('POST @listsearch: /manager/search','ManagerController->listSearch');
 $f3->route('GET @entityadd: /manager/entity/add','ManagerController->addEntity');
-$f3->route('GET @relationshipadd: /manager/link/add','ManagerController->addRelationship');
+$f3->route('GET @relationshipadd: /manager/relationship/add','ManagerController->addRelationship');
 $f3->route('GET @entityedit: /manager/editobject/entity/@id','ManagerController->editEntity');
+$f3->route('POST @doeditentity: /manager/entity/edit','ManagerController->doEditEntity');
 $f3->route('GET @relationshipedit: /manager/editobject/relationship/@id','ManagerController->editRelationship');
 $f3->route('GET @entitydelete: /manager/deleteobject/entity/@id','ManagerController->deleteEntity');
 $f3->route('GET @relationshipdelete: /manager/deleteobject/relationship/@id','ManagerController->deleteRelationship');

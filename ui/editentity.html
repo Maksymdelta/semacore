@@ -1,0 +1,208 @@
+<include href="'../'.{{ @UI }}.'header.html'" xmlns="http://www.w3.org/1999/html"/>
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#addnew').idealforms();
+        $('.selectpicker').selectpicker();
+
+        $('#add').click(function(){
+//            alert($('#addnew').idealforms('is:valid', 'name'));
+            $('#addnew').idealforms('removeFields', 'infobittitle infobit');
+            if($('#addnew').idealforms('get:invalid').length==0)
+            {
+                $( "#addnew" ).submit();
+            }
+            else{
+                $('#addnew').idealforms('focusFirstInvalid');
+            }
+        });
+
+        $('#addinfobit').click(function(){
+            if($('#newinfobitwell').is(':visible')) {
+                if($('#addnew').idealforms('get:invalid').length==0)
+                {
+                    $("#addnew").attr("action", "{{@ALIASES.addinfobit}}");
+                    $( "#addnew" ).submit();
+                }
+                else{
+                    $('#addnew').idealforms('focusFirstInvalid');
+                }
+            }
+            else{
+                $('#newinfobitwell').toggle('slow');
+                $('#cancelinfobit').toggle('slow');
+            }
+        });
+
+        $('#editrelationship').click(function(){
+
+            $(location).attr('href',"/manager/entity/"+entityid+"/deleteinfobit/"+infobitid);
+
+        })
+
+        $('#cancelinfobit').click(function(){
+            $('#newinfobitwell').toggle('slow');
+            $('#cancelinfobit').toggle('slow');
+        });
+
+    });
+
+
+
+
+    function Msg(entityid,infobitid)
+    {
+        var conf=confirm('Ви дійсно хочете видалити цю інформацію?')
+        if(conf==true)
+        {
+            $(location).attr('href',"/manager/entity/"+entityid+"/deleteinfobit/"+infobitid);
+        }
+    }
+</script>
+
+<div id="wrapper">
+    <check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Редагувати сутність</div>
+            <div class="panel-body">
+                <form id="addnew" name="addnew" action="{{@ALIASES.doeditentity}}" class="idealforms" method="post">
+                <div class="field">
+                    <label for="name">Ім'я об'єкту</label>
+                    <input data-idealforms-rules="required" placeholder="Ім'я об'єкту" required="required" type="text" name="name" id="name" value="<check if="{{ isset(@entity)}}">{{ @entity->getName()}}</check>"/>
+                    <span class="error"></span>
+                    <i class="icon"></i>
+                </div>
+
+
+                <check if="{{ isset(@types) }}">
+                    <div class="field">
+                        <label for="type">Тип</label>
+                        <select name="type" id="type" class="selectpicker">
+                            <repeat group="{{ @types }}" value="{{ @type }}">
+                                <option value="{{ @type }}" <check if="{{ isset(@entity)&&@entity->getObjType()==@type }}">selected</check>>{{@type}}</option>
+                            </repeat>
+
+                        </select>
+                    </div>
+                </check>
+
+                <check if="{{ isset(@classes) }}">
+                    <div class="field">
+                        <label for="type">Класи</label>
+                        <select name="class[]" id="class" class="selectpicker" multiple title="Виберіть клас">
+                            <repeat group="{{ @classes }}" value="{{ @class }}">
+                                <option value="{{ @class }}" <check if="{{ isset(@entity)&&@entity->belongToClass(@class)}}">selected</check>>{{@class}}</option>
+                            </repeat>
+
+                        </select>
+                    </div>
+                </check>
+
+
+             <div class="clear">
+
+                 <fieldset class="border">
+                     <legend class="border">Опис</legend>
+
+                <div class="field">
+                        <textarea data-idealforms-rules="required"id="description" name="description" placeholder="Опис"><check if="{{ isset(@entity)}}">{{ @entity->getDescription()}}</check></textarea>
+                    <span class="error"></span>
+                    <i class="icon"></i>
+                    </div>
+                 </fieldset>
+                     </div>
+
+
+                <div class="clear">
+
+                    <fieldset class="border">
+                        <legend class="border">Інформація</legend>
+                        <check if="{{ isset(@entity)&&6!=null}}">
+                            <repeat group="{{ @entity->getInfo_bits() }}" value="{{ @infobit }}">
+
+                                <table class="infobit">
+                                    <tr>
+                                        <td>
+                                            <div class="field">
+                                                <input type="text" class="form-control" placeholder="Назва" data-idealforms-rules="required" id="infobittitle[{{ @infobit->getUid() }}]" name="infobittitle[{{ @infobit->getUid() }}]" value="{{ @infobit->getKey() }}">
+                                                <span class="error"></span>
+                                                <i class="icon"></i>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <div class="field">
+                                                <textarea data-idealforms-rules="required" id="infobitvalue[{{@infobit->getUid()}}]" name="infobitvalue[{{@infobit->getUid()}}]" placeholder="Текст">{{ @infobit->getValue() }}</textarea>
+                                                <span class="error"></span>
+                                                <i class="icon"></i>
+                                            </div>
+                                        </td>
+                                        <td><a href="javascript:Msg('{{@entity->getUid()}}','{{@infobit->getUid()}}');"><img src="{{ @BASE }}/{{ @UI}}img/close.png" /></a></td>
+                                    </tr>
+                                </table>
+                            </repeat>
+                        </check>
+
+                        <div id="newinfobitwell" class="well well-lg">
+                            <table id="newinfobit">
+                                <tr>
+                                    <td>
+                                        <div class="field">
+                                            <input type="text" class="form-control" placeholder="Назва" data-idealforms-rules="required" id="infobittitle" name="infobittitle">
+                                            <span class="error"></span>
+                                            <i class="icon"></i>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="field">
+                                            <textarea data-idealforms-rules="required" id="infobit" name="infobit" placeholder="Текст"></textarea>
+                                            <span class="error"></span>
+                                            <i class="icon"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+
+                        <div class="field" id="addinfobitwrap">
+                            <button class="btn btn-default" type="button" id="cancelinfobit" name="cancelinfobit">Відмінити</button>
+                            <button class="btn btn-default" type="button" id="addinfobit" name="addinfobit">Додати</button>
+                        </div>
+                    </fieldset>
+
+
+                </div>
+                    <table id="relationshipbuttons">
+                        <tr>
+                            <td>
+                                <div class="field">
+                                    <button class="btn btn-default" type="button" id="editrelationship" name="editrelationship">Редагувати зв'язки</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field">
+                                    <input type="hidden" name="uid" id="uid" value="<check if="{{isset(@entity)}}">{{@entity->getUid()}}</check>">
+                                <button class="btn btn-default" type="button" id="add" name="add">Зберегти</button>
+                            </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </form>
+                 </div>
+            </div>
+
+
+
+
+            </div>
+
+
+</body>
+</html>

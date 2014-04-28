@@ -81,6 +81,7 @@ abstract class Object implements MongoMappable,NeoMappable
 
 	public function save()
 	{
+        if($this->getUid())return $this->update();
         $this->Created_at=time();
         $this->setInfobits_ids();
         if(!$this->MongoMapper->save($this))return false;
@@ -113,6 +114,7 @@ abstract class Object implements MongoMappable,NeoMappable
 	public function update()
 	{
         $this->MongoMapper->update($this);
+        $this->Neo4jMapper->update($this);
 	}
 
     function injectMapper(MongoMapper $mapper)
@@ -134,6 +136,12 @@ abstract class Object implements MongoMappable,NeoMappable
 
 	public function getInfo_bits()
 	{
+        $this->loadInfo_bits();
+		return $this->Info_bits;
+	}
+
+    private function loadInfo_bits()
+    {
         if($this->Info_bits==null&&$this->Info_bits_ids!=null)
         {
             foreach($this->Info_bits_ids as $id)
@@ -141,17 +149,41 @@ abstract class Object implements MongoMappable,NeoMappable
                 $this->Info_bits[]=new InfoBit($id);
             }
         }
-		return $this->Info_bits;
-	}
+    }
 
 	/**
-	 * 
+	 *
 	 * @param $Info_bit
 	 */
-	public function addInfo_bits(InfoBit $Info_bit)
+	public function addInfo_bit(InfoBit $Info_bit)
 	{
+        $this->loadInfo_bits();
+        if($Info_bit->getUid()==null)$Info_bit->save();
 		$this->Info_bits[] = $Info_bit;
+        $this->Info_bits_ids[]=$Info_bit->getUid();
 	}
+
+    /**
+     * @param array $Info_bits array of Info_bit objects
+     */
+    public function setInfo_bits(array $Info_bits)
+    {
+        $this->Info_bits=$Info_bits;
+        $ids=array();
+        foreach($Info_bits as $infobit)
+        {
+            if($infobit->getUid()==null)$infobit->save();
+            $ids[]=$infobit->getUid();
+        }
+        $this->Info_bits_ids=$ids;
+    }
+
+    public function deleteInfo_bit(InfoBit $infoBit)
+    {
+        $this->Info_bits = array_diff($this->getInfo_bits(), array($infoBit));
+        $this->Info_bits_ids = array_diff($this->Info_bits_ids, array($infoBit->getUid()));
+        $infoBit->delete();
+    }
 
 	public function getObjType()
 	{

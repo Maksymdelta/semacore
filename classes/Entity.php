@@ -18,6 +18,17 @@ class Entity extends Object
 		return $this->Classes;
 	}
 
+    /**
+     * Check if entity belong to class
+     * @param $className
+     * @return bool
+     */
+
+    public function belongToClass($className)
+    {
+       return in_array($className,$this->getClasses(),true);
+    }
+
 
 	public function setClass(array $classes)
 	{
