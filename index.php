@@ -4,11 +4,14 @@ $f3=require('lib/base.php');
 
 $f3->set('DEBUG',3);
 if ((float)PCRE_VERSION<7.9)
-	trigger_error('PCRE version is out of date');
+ trigger_error('PCRE version is out of date');
 $f3->set('AUTOLOAD','classes/;controllers/;lib');
 $f3->set('CACHE', true);
 require('lib/vendor/autoload.php');
 $f3->config('config.ini');
+
+\Template::instance()->extend('handlebars','Admin\Template\Helpers::handlebars');
+$f3->set('mongo', new \DB\Mongo($f3->get('mongoserver'), $f3->get('mongodb')));
 
 $f3->route('GET @list: /manager/list','ManagerController->listObjects');
 $f3->route('POST @addinfobit: /manager/entity/addinfobit','ManagerController->addInfobitToEntity');
@@ -22,5 +25,11 @@ $f3->route('GET @relationshipedit: /manager/editobject/relationship/@id','Manage
 $f3->route('GET @entitydelete: /manager/deleteobject/entity/@id','ManagerController->deleteEntity');
 $f3->route('GET @relationshipdelete: /manager/deleteobject/relationship/@id','ManagerController->deleteRelationship');
 $f3->route('POST @doaddentity: /manager/entity/add','ManagerController->doAddEntity');
+
+// Admin routes
+$f3->route('GET @admin_managers_list: /admin/managers','Admin\Controller\Manager->listAll');
+$f3->route('GET @admin_managers_show: /admin/managers/@managerID','Admin\Controller\Manager->show');
+
+
 
 $f3->run();

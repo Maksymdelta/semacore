@@ -1,0 +1,19 @@
+.container {
+	margin-top: 2px;
+}
+
+.content {
+	padding-top: 30px;
+}
+
+.managers-grid tr {
+  cursor: pointer;
+}
+
+.mg-remove {
+	width: 31px;
+}
+
+.mg-remove:hover {
+	background-color: #fcf8e3 !important;
+}
