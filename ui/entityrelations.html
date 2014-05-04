@@ -1,0 +1,233 @@
+<include href="'../'.{{ @UI }}.'header.html'" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<div id="wrapper">
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.selectpicker').selectpicker();
+            $('#cancelrelation').click(function(){
+                $('#newrelationwell').toggle('slow');
+                $('#cancelrelation').toggle('slow');
+            });
+
+            $('#addrelation').click(function(){
+                if($('#newrelationwell').is(':visible')) {
+                    $( "#addnew" ).submit();
+                }
+                else{
+                    $('#newrelationwell').toggle('slow');
+                    $('#cancelrelation').toggle('slow');
+                }
+            });
+
+            $('table#relations div.bootstrap-select .dropdown-menu li').click(function(e){
+                var selectedIndex = $(e.currentTarget).attr('rel');
+                var select =$('select option:eq(' + selectedIndex + ')').parent();
+                var val = $('select option:eq(' + selectedIndex + ')').attr('value');
+                var id = select.attr('id');
+                $.ajax(
+                        {
+                            type: 'POST',
+                            url: "{{@ALIASES.relationshipsettype}}",
+                            dataType: 'text',
+                            cache: false,
+                            async: false,
+                            data: { type: val, relation:  id},
+                            success: function(result)
+                            {
+                                if(result=='false')
+                                {
+                                    $('#selecterror').toggle('fast');
+                                }
+                                else{
+
+                                    location.reload();
+                                }
+                            },
+                            error: function(){
+                                $('#selecterror').toggle('fast');
+                            }
+                        });
+
+            });
+
+            var engine = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: '/manager/entity/{{ @entity->getUid()}}/query/%QUERY.json'
+            });
+            engine.initialize();
+            var typehead=$('#typeahead').typeahead({
+                        minLength: 3,
+                        highlight: true
+                    },
+                    {
+                        name: 'dataset',
+                        displayKey: 'name',
+                        source: engine.ttAdapter()
+                    }).on('typeahead:selected', function (obj, datum) {
+                        $("#entity2").val(datum['_id']);
+                    })
+
+        })
+        function Msg(entityid,relationid)
+        {
+            var conf=confirm('Ви дійсно хочете видалити цей зв\'язок?')
+            if(conf==true)
+            {
+                $(location).attr('href',"/manager/entity/"+entityid+"/deleterelation/"+relationid);
+            }
+        }
+
+        function showDialog(entityid, relationid)
+        {
+            $("#relationdialogid").val(relationid);
+            $("#entitydialogid").val(entityid);
+            $('#typeaheaddialog').val('');
+            $( "#entitydialog" ).modal({
+                minWidth: 350,
+                minHeight: 130,
+                autoResize: true,
+                modal: true,
+                opacity:80,
+                overlayCss: {backgroundColor:"#fff"},
+                containerCss:{
+                    backgroundColor:"#F5F5F5",
+                    borderColor:"#DDDDDD",
+                    padding:20
+                },
+                onShow: function(dialog)
+                    {
+                        $('#dialogerror').hide();
+                        var engine = new Bloodhound({
+                            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                            queryTokenizer: Bloodhound.tokenizers.whitespace,
+                            remote: '/manager/entity/{{ @entity->getUid()}}/query/%QUERY.json'
+                        });
+                        engine.initialize();
+                        var typeheaddialog=$('#typeaheaddialog').typeahead({
+                                    minLength: 3,
+                                    highlight: true
+                                },
+                                {
+                                    name: 'dataset',
+                                    displayKey: 'name',
+                                    source: engine.ttAdapter()
+                                }).on('typeahead:selected', function (obj, datum) {
+                                    $("#entitydialogid").val(datum['_id']);
+                                });
+                        $('#setentitydialog').click(function(){
+
+                            $.ajax(
+                                    {
+                                        type: 'POST',
+                                        url: "{{@ALIASES.changerelationship}}",
+                                        dataType: 'text',
+                                        cache: false,
+                                        async: false,
+                                        data: { entity1: '{{@entity->getUid()}}', entity2: $("#entitydialogid").val(), relation:  relationid},
+                                        success: function(result)
+                                        {
+                                            if(result=='false')
+                                            {
+                                                dialog.container.height(180);
+                                                $('#dialogerror').toggle('fast');
+                                            }
+                                            else{
+                                                $.modal.close();
+                                                location.reload();
+                                            }
+                                        },
+                                        error: function(){
+                                            dialog.container.height(180);
+                                            $('#dialogerror').toggle('fast');
+
+                                        }
+                                    });
+                        })
+                    }
+            });
+        }
+    </script>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Редагувати зв'зки сутності <check if="{{ isset(@entity)}}"><a href="/manager/editobject/entity/{{ @entity->getUid()}}">{{ @entity->getName()}}</a> </check></div>
+        <div class="panel-body">
+            <fieldset class="border">
+                <legend class="border">Зв'зки</legend>
+
+                <check if="{{ @entity->getRelationships()&&count(@entity->getRelationships())>0 }}">
+                    <table id="relations">
+                        <repeat group="{{ @entity->getRelationships() }}" value="{{ @relationship }}">
+                        <tr>
+                            <td>
+                                <check if="{{ isset(@relationtypes) }}">
+                                    <select name="{{ @relationship->getUid() }}" id="{{ @relationship->getUid() }}" class="selectpicker">
+                                        <repeat group="{{ @relationtypes }}" value="{{ @type }}">
+                                            <option value="{{ @type }}" <check if="{{ @type==@relationship->getObjType()}}">selected</check>>{{@type}}</option>
+                                        </repeat>
+                                    </select>
+                                </check>
+
+                            </td>
+                            <td>
+                                <a href="javascript:showDialog('{{ @relationship->getOtherSide(@entity)->getUid()}}','{{ @relationship->getUid() }}');">{{ @relationship->getOtherSide(@entity)->getName() }}</a>
+                            </td>
+                            <td><a href="javascript:Msg('{{@entity->getUid()}}','{{ @relationship->getUid() }}');"><img src="{{ @BASE }}/{{ @UI}}img/close.png" /></a></td>
+                        </tr>
+                         </repeat>
+                    </table>
+                    </check>
+                <div id="selecterror" class="alert alert-danger" style="display: none;">Помилка при збережені! Спробуйте будь ласка ще раз.</div>
+
+                <form id="addnew" name="addnew" action="{{@ALIASES.doaddrelationship}}" method="post">
+                    <div id="newrelationwell" class="well well-lg">
+                        <table id="newrelation">
+                            <tr>
+                                <td>
+                                    <check if="{{ isset(@relationtypes) }}">
+                                        <select name="type" id="type" class="selectpicker">
+                                            <repeat group="{{ @relationtypes }}" value="{{ @type }}">
+                                                <option value="{{ @type }}">{{@type}}</option>
+                                            </repeat>
+                                        </select>
+                                    </check>
+
+                                </td>
+                                <td>
+                                        <input id="typeahead" class="form-control" type="text" placeholder="Почніть набирати ім'я або назву" />
+                                    <input type="hidden" id="entity1" name="entity1" value="{{ @entity->getUid()}}"/>
+                                    <input type="hidden" id="entity2" name="entity2" value=""/>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </form>
+
+                    <div class="field" id="addinfobitwrap">
+                        <button class="btn btn-default" type="button" id="cancelrelation" name="cancelrelation">Відмінити</button>
+                        <button class="btn btn-default" type="button" id="addrelation" name="addrelation">Додати</button>
+                    </div>
+             </fieldset>
+        </div>
+    </div>
+
+
+</div>
+<div id="entitydialog" style="display: none;">
+    <script type="text/javascript">
+
+    </script>
+    <input type="hidden" id="entitydialogid" name="entitydialogid" value=""/>
+    <input type="hidden" id="relationdialogid" name="relationdialogid" value=""/>
+    <input id="typeaheaddialog" class="form-control" type="text" placeholder="Почніть набирати ім'я або назву" />
+    <div id="dialogerror" class="alert alert-danger">Помилка при збережені!<br />Спробуйте ще раз.</div>
+    <div class="buttonstylewrap">
+        <button class="btn btn-default" type="button" id="setentitydialog" name="setentitydialog">Зберегти</button>
+        <button class="btn btn-default simplemodal-close" type="button" id="cancelrelationdialog" name="cancelrelationdialog">Відмінити</button>
+    </div>
+
+</div>
+
+</body>
+</html>

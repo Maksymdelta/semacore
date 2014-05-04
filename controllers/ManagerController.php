@@ -13,18 +13,22 @@ class ManagerController extends baseController{
         else{
             $result=MongoSearch::getInstance()->searchSortedByCreation(array(new Entity(),new Relationship()),null,$options);
         }
-        $output=array();
-        foreach($result as $obj)
+        if($result!=false)
         {
-            $output["aaData"][]=array(
-                "DT_RowId"=>(string)$obj.'|'.$obj->getUid(),
-                (string)$obj=="Entity"?'Сутність':'Зв\'язок',
-                $obj->getName(),
-                $obj->getObjType(),
-                date('m.d.y h:m',$obj->getCreated_at())
-            );
+            $output=array();
+            foreach($result as $obj)
+            {
+                $output["aaData"][]=array(
+                    "DT_RowId"=>(string)$obj.'|'.$obj->getUid(),
+                    (string)$obj=="Entity"?'Сутність':'Зв\'язок',
+                    $obj->getName(),
+                    $obj->getObjType(),
+                    date('m.d.y h:m',$obj->getCreated_at())
+                );
+            }
+            if(isset($output["aaData"]))$f3->set('aaData',json_encode( $output["aaData"] ));
         }
-        if(isset($output["aaData"]))$f3->set('aaData',json_encode( $output["aaData"] ));
+
         $f3->set('head','../'.$f3->get('UI').'list_head.html');
         echo Template::instance($f3)->render('../'.$f3->get('UI').'list.html');
         $f3->clear('SESSION.request');
@@ -64,7 +68,83 @@ class ManagerController extends baseController{
 
     function addRelationship($f3)
     {
+        if($f3->get('PARAMS.entityid'))
+        {
+            $ent=new Entity($f3->get('PARAMS.entityid'));
+            $f3->set('entity', $ent);
+            $f3->set('relationtypes', RelationType::getTypes());
+            $f3->set('head','../'.$f3->get('UI').'entityrelations_head.html');
+            echo Template::instance($f3)->render('../'.$f3->get('UI').'entityrelations.html');
+        }
+    }
 
+
+    function changeRelationship($f3)
+    {
+        if(!$f3->get('POST.entity1')||!$f3->get('POST.entity2')||!$f3->get('POST.relation'))
+        {
+            echo 'false';
+            return;
+        }
+
+        $ent=new Entity($f3->get('POST.entity1'));
+        $ent2=new Entity($f3->get('POST.entity2'));
+        $rel=new Relationship($f3->get('POST.relation'));
+        $rel->setStart_node($ent);
+        $rel->setEnd_node($ent2);
+        if($rel->update())
+        {
+            echo 'success';
+            return;
+        }
+        echo 'false';
+    }
+
+    function relationshipSetType($f3)
+    {
+        if(!$f3->get('POST.type')||!$f3->get('POST.relation'))
+        {
+            echo 'false';
+            return;
+        }
+        $rel=new Relationship($f3->get('POST.relation'));
+        $rel->setType($f3->get('POST.type'));
+        $rel->save();
+        echo 'success';
+    }
+
+    function queryEntity($f3)
+    {
+        if(!$f3->get('PARAMS.query')||!$f3->get('PARAMS.entityid'))
+        {
+            echo json_encode('false');
+            return;
+        }
+        $options=array('limit'=>50, 'order'=>array('created_at'=>1));
+        if(false!=$result=MongoSearch::getInstance()->ajaxSearch($f3->get('PARAMS.entityid'),new Entity(),array('name'=>array('$in'=>[new \MongoRegex('/'.$f3->get('PARAMS.query').'/i'),'$exists'=>true])),$options))
+            echo json_encode($result);
+        else
+            echo json_encode('false');
+    }
+
+    function doAddRelationship($f3)
+    {
+        if(!$f3->get('POST.entity1')||!$f3->get('POST.entity2')||!$f3->get('POST.type'))
+        {
+            $f3->reroute('@list');
+        }
+        $ent1=new Entity($f3->get('POST.entity1'));
+        $ent2=new Entity($f3->get('POST.entity2'));
+        if($ent1->getUid()==null||$ent2->getUid()==null)
+        {
+            $f3->reroute('@list');
+        }
+        $rel=new Relationship();
+        $rel->setStart_node($ent1);
+        $rel->setEnd_node($ent2);
+        $rel->setType($f3->get('POST.type'));
+        $rel->save();
+        $f3->reroute('@relationshipadd(@entityid='.$f3->get('POST.entity1').')');
     }
 
     function editEntity($f3)
@@ -160,7 +240,7 @@ class ManagerController extends baseController{
     {
         if($f3->get('PARAMS.id'))
         {
-            if(false!=$ent=new Entity($f3->get('PARAMS.id')))
+            $ent=new Entity($f3->get('PARAMS.id'));
             $ent->delete();
         }
         $f3->reroute('@list');
@@ -168,7 +248,12 @@ class ManagerController extends baseController{
 
     function deleteRelationship($f3)
     {
-
+        if($f3->get('PARAMS.id'))
+        {
+            $rel=new Relationship($f3->get('PARAMS.id'));
+            $rel->delete();
+        }
+        $f3->get('PARAMS.entityid')?$f3->reroute('@relationshipadd(@entityid='.$f3->get('PARAMS.entityid').')'):$f3->reroute('@list');
     }
 
 } 

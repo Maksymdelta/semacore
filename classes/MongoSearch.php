@@ -46,8 +46,43 @@ class MongoSearch {
                 }
             }
         }
-        return $result;
+        if(count($result)>0)
+            return $result;
+        else
+            return false;
+    }
 
+
+    /**
+     * @param $id * of object to remove from result
+     * @param MongoMappable $mappable
+     * @param array $filter
+     * @param array $options
+     * @return array|bool
+     */
+    function ajaxSearch($id,MongoMappable $mappable,array $filter=null,array $options=null)
+    {
+            $objType=$mappable->__toString();
+            $obj=new DB\Mongo\Mapper(self::$db,$objType);
+            $objList=$obj->select(array('name','_id'),$filter,$options);
+            if(count($objList)>0)
+                {
+                    array_walk($objList,array($this, 'castObject'));
+                    $result=array();
+                    foreach($objList as $obj)
+                    {
+                        if($obj['_id']!=$id)$result[]=$obj;
+                    }
+                    return $result;
+                }
+            else
+                return false;
+    }
+
+    private function castObject(&$mongoobj,$key=null)
+    {
+        $mongoobj=$mongoobj->cast();
+        $mongoobj['_id']=(string)$mongoobj['_id'];
     }
 
 
@@ -75,8 +110,13 @@ class MongoSearch {
                 }
             }
         }
-        krsort($result);
-        return $result;
+        if(count($result)>0)
+        {
+            krsort($result);
+            return $result;
+        }
+        else
+            return false;
     }
 
 

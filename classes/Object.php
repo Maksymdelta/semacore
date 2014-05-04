@@ -16,7 +16,7 @@ abstract class Object implements MongoMappable,NeoMappable
 	private $Created_at;
 	private $Created_by;
     private $Created_by_id;
-	private $Name;
+	protected $Name;
 	private $MongoMapper;
     protected $Neo4jMapper;
     protected $Neo4jObject;
@@ -113,8 +113,18 @@ abstract class Object implements MongoMappable,NeoMappable
 
 	public function update()
 	{
-        $this->MongoMapper->update($this);
-        $this->Neo4jMapper->update($this);
+        if($this->MongoMapper->update($this))
+        {
+            try{
+                $this->Neo4jMapper->update($this);
+                return true;
+            }
+            catch(Exception $e)
+            {
+                return false;
+            }
+        }
+            return false;
 	}
 
     function injectMapper(MongoMapper $mapper)
@@ -187,7 +197,6 @@ abstract class Object implements MongoMappable,NeoMappable
 
 	public function getObjType()
 	{
-        if($this->Type==null&&$this->Neo4jObject!=null)$this->Type=$this->Neo4jObject->getProperty('type');
 		return $this->Type;
 	}
 

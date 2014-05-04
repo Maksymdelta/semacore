@@ -79,7 +79,7 @@ class MongoMapper
         {
             $obj->$fieldname=$value;
         }
-        $obj->save();
+        return $obj->save();
 	}
 
 

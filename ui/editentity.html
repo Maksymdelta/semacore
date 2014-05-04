@@ -35,8 +35,8 @@
         });
 
         $('#editrelationship').click(function(){
-
-            $(location).attr('href',"/manager/entity/"+entityid+"/deleteinfobit/"+infobitid);
+            var entityid=$('#uid').val();
+            $(location).attr('href',"/manager/relationship/add/"+entityid);
 
         })
 

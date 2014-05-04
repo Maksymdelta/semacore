@@ -15,12 +15,17 @@ $f3->route('POST @addinfobit: /manager/entity/addinfobit','ManagerController->ad
 $f3->route('GET @deleteinfobit: /manager/entity/@entityid/deleteinfobit/@infobitid','ManagerController->deleteInfobitFromEntity');
 $f3->route('POST @listsearch: /manager/search','ManagerController->listSearch');
 $f3->route('GET @entityadd: /manager/entity/add','ManagerController->addEntity');
-$f3->route('GET @relationshipadd: /manager/relationship/add','ManagerController->addRelationship');
+$f3->route('GET @relationshipadd: /manager/relationship/add/@entityid','ManagerController->addRelationship');
+$f3->route('POST @doaddrelationship: /manager/relationship/add','ManagerController->doAddRelationship');
+$f3->route('POST @changerelationship: /manager/relationship/change [ajax]','ManagerController->changeRelationship');
+$f3->route('POST @relationshipsettype: /manager/relationship/settype [ajax]','ManagerController->relationshipSetType');
 $f3->route('GET @entityedit: /manager/editobject/entity/@id','ManagerController->editEntity');
+$f3->route('GET @entityquery: /manager/entity/@entityid/query/@query.json [ajax]','ManagerController->queryEntity');
 $f3->route('POST @doeditentity: /manager/entity/edit','ManagerController->doEditEntity');
 $f3->route('GET @relationshipedit: /manager/editobject/relationship/@id','ManagerController->editRelationship');
 $f3->route('GET @entitydelete: /manager/deleteobject/entity/@id','ManagerController->deleteEntity');
 $f3->route('GET @relationshipdelete: /manager/deleteobject/relationship/@id','ManagerController->deleteRelationship');
+$f3->route('GET /manager/entity/@entityid/deleterelation/@id','ManagerController->deleteRelationship');
 $f3->route('POST @doaddentity: /manager/entity/add','ManagerController->doAddEntity');
 
 $f3->run();

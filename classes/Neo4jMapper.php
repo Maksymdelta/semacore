@@ -35,6 +35,7 @@ class Neo4jMapper
         if($match!=null)
         {
             $Mappable->setNeo4jObject($match);
+            $Mappable->setType($match->getProperty('type'));
             return true;
         }
     }
@@ -75,13 +76,6 @@ class Neo4jMapper
         $this->attached[$fieldName] = &$ref;
     }
 
-    public function fromDataStore($data) {
-        foreach ($data as $fieldName => $value) {
-            if (array_key_exists($fieldName, $this->attached)) {
-                $this->attached[$fieldName] = $value;
-            }
-        }
-    }
 
     public function fromDomainObject() {
         $data = array();
