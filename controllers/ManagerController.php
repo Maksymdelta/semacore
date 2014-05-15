@@ -66,7 +66,7 @@ class ManagerController extends baseController{
         $f3->reroute('@list');
     }
 
-    function addRelationship($f3)
+    function addRelationshipToEntity($f3)
     {
         if($f3->get('PARAMS.entityid'))
         {
@@ -135,19 +135,20 @@ class ManagerController extends baseController{
 
     function queryEntity($f3)
     {
-        if(!$f3->get('PARAMS.query')||!$f3->get('PARAMS.entityid'))
+        if(!$f3->get('PARAMS.query'))
         {
             echo json_encode('false');
             return;
         }
+        $f3->get('PARAMS.entityid')?$entid=$f3->get('PARAMS.entityid'):$entid=null;
         $options=array('limit'=>50, 'order'=>array('created_at'=>1));
-        if(false!=$result=MongoSearch::getInstance()->ajaxSearch($f3->get('PARAMS.entityid'),new Entity(),array('name'=>array('$in'=>[new \MongoRegex('/'.$f3->get('PARAMS.query').'/i'),'$exists'=>true])),$options))
+        if(false!=$result=MongoSearch::getInstance()->ajaxSearch($entid,new Entity(),array('name'=>array('$in'=>[new \MongoRegex('/'.$f3->get('PARAMS.query').'/i'),'$exists'=>true])),$options))
             echo json_encode($result);
         else
             echo json_encode('false');
     }
 
-    function doAddRelationship($f3)
+    function doAddRelationshipToEntity($f3)
     {
         if(!$f3->get('POST.entity1')||!$f3->get('POST.entity2')||!$f3->get('POST.type'))
         {
@@ -165,6 +166,30 @@ class ManagerController extends baseController{
         $rel->setType($f3->get('POST.type'));
         $rel->save();
         $f3->reroute('@relationshipadd(@entityid='.$f3->get('POST.entity1').')');
+    }
+
+    function addRelationship($f3)
+    {
+        $f3->set('types',RelationType::getTypes());
+        $f3->set('head','../'.$f3->get('UI').'editrelationship_head.html');
+        echo Template::instance($f3)->render('../'.$f3->get('UI').'addrelationship.html');
+    }
+
+    function doAddRelationship($f3)
+    {
+        if(!$f3->get('POST.startEntity')||!$f3->get('POST.endEntity')||!$f3->get('POST.type'))
+        {
+            Flash::setflash('Виберіть будь ласка 2 об\'єкти');
+            $f3->reroute('@newrelationship');
+        }
+        $startEnt=new Entity($f3->get('POST.startEntity'));
+        $endEnt=new Entity($f3->get('POST.endEntity'));
+        $rel=new Relationship();
+        $rel->setStart_node($startEnt);
+        $rel->setEnd_node($endEnt);
+        $rel->setType($f3->get('POST.type'));
+        $rel->save();
+        $f3->reroute('@relationshipedit(@id='.$rel->getUid().')');
     }
 
     function editEntity($f3)
@@ -293,7 +318,7 @@ class ManagerController extends baseController{
         }
         $rel=new Relationship($f3->get('PARAMS.id'));
         $f3->set('relationship',$rel);
-        $f3->set('types',EntityType::getTypes());
+        $f3->set('types',RelationType::getTypes());
         $f3->set('head','../'.$f3->get('UI').'editrelationship_head.html');
         echo Template::instance($f3)->render('../'.$f3->get('UI').'editrelationship.html');
     }

@@ -1,0 +1,119 @@
+<include href="'../'.{{ @UI }}.'header.html'" xmlns="http://www.w3.org/1999/html"/>
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#addnew').idealforms();
+        $('.selectpicker').selectpicker();
+
+        $('#add').click(function(){
+            var start=$("#startEntity").val();
+            var end=$("#endEntity").val();
+        if(start.length==0 || end.length==0)
+        {
+            $('#alertnoobject').show();
+        }
+            else{
+            $( "#addnew" ).submit();
+        }
+        });
+    });
+
+
+    function showDialog(id)
+    {
+        $('#typeaheaddialog').val('');
+        $( "#entitydialog" ).modal({
+            minWidth: 350,
+            minHeight: 130,
+            autoResize: true,
+            modal: true,
+            opacity:80,
+            overlayCss: {backgroundColor:"#fff"},
+            containerCss:{
+                backgroundColor:"#F5F5F5",
+                borderColor:"#DDDDDD",
+                padding:20
+            },
+            onShow: function(dialog)
+            {
+                $('#dialogerror').hide();
+                var engine = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: '/manager/entity/query/%QUERY.json'
+                });
+                engine.initialize();
+                var typeheaddialog=$('#typeaheaddialog').typeahead({
+                            minLength: 3,
+                            highlight: true
+                        },
+                        {
+                            name: 'dataset',
+                            displayKey: 'name',
+                            source: engine.ttAdapter()
+                        }).on('typeahead:selected', function (obj, datum) {
+                            $("#entitydialogid").val(datum['_id']);
+                            $("#entitydialogname").val(datum['name']);
+                        });
+                $('#setentitydialog').click(function(){
+                    $("#"+id).val($("#entitydialogid").val());
+                    $("#"+id+"Url").text($("#entitydialogname").val());
+                    $.modal.close();
+                })
+            }
+        });
+    }
+
+
+</script>
+
+<div id="wrapper">
+    <check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+    <div class="alert alert-danger" id="alertnoobject" style="display: none;">Виберіть будь ласка 2 об'єкти</div>
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Додати зв'язок</div>
+            <div class="panel-body">
+                <form id="addnew" name="addnew" action="{{@ALIASES.doaddnewrelationship}}" class="idealforms" method="post">
+                    <div id="relationshipobjects">
+                    <check if="{{ isset(@types) }}">
+                        <div class="field" >
+                            <label for="type">Тип</label>
+                            <select name="type" id="type" class="selectpicker">
+                                <repeat group="{{ @types }}" value="{{ @type }}">
+                                    <option value="{{ @type }}">{{@type}}</option>
+                                </repeat>
+
+                            </select>
+                        </div>
+                    </check>
+                        <div class="field"><label>Об'єкт</label><a href="javascript:showDialog('startEntity');" id="startEntityUrl">Вибрати</a></div>
+                        <input id="startEntity" name="startEntity" type="hidden" value="">
+                        <div class="field"><label>Об'єкт</label><a href="javascript:showDialog('endEntity');" id="endEntityUrl">Вибрати</a></div>
+                        <input id="endEntity" name="endEntity" type="hidden" value="">
+                    </div>
+
+
+                    <div class="field" id="save">
+                    <button class="btn btn-default" type="button" id="add" name="add">Зберегти</button>
+                        </div>
+
+                </form>
+                 </div>
+            </div>
+
+            </div>
+<div id="entitydialog" style="display: none;">
+    <input type="hidden" id="entitydialogid" name="entitydialogid" value=""/>
+    <input type="hidden" id="entitydialogname" name="entitydialogname" value=""/>
+    <input id="typeaheaddialog" class="form-control" type="text" placeholder="Почніть набирати ім'я або назву" />
+    <div class="buttonstylewrap">
+        <button class="btn btn-default" type="button" id="setentitydialog" name="setentitydialog">Вибрати</button>
+        <button class="btn btn-default simplemodal-close" type="button" id="cancelrelationdialog" name="cancelrelationdialog">Відмінити</button>
+    </div>
+
+</div>
+
+</body>
+</html>

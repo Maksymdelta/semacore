@@ -60,7 +60,7 @@ class MongoSearch {
      * @param array $options
      * @return array|bool
      */
-    function ajaxSearch($id,MongoMappable $mappable,array $filter=null,array $options=null)
+    function ajaxSearch($id=null,MongoMappable $mappable,array $filter=null,array $options=null)
     {
             $objType=$mappable->__toString();
             $obj=new DB\Mongo\Mapper(self::$db,$objType);

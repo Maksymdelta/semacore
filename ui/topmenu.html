@@ -15,5 +15,13 @@
             <li><a href="{{@ALIASES.entityadd}}">Додати сутність</a></li>
         </false>
     </check>
+    <check if="{{ F3::get('SERVER.REQUEST_URI')==@ALIASES.newrelationship }}">
+        <true>
+            <li class="active"><a href="{{@ALIASES.newrelationship}}">Додати зв'язок</a></li>
+        </true>
+        <false>
+            <li><a href="{{@ALIASES.newrelationship}}">Додати зв'язок</a></li>
+        </false>
+    </check>
 </ul>
 
