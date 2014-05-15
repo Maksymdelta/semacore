@@ -87,6 +87,16 @@ class Relationship extends Object
         return $this->getStart_node();
     }
 
+
+    function replaceEntity(Entity $currentEntity,Entity $newEntity)
+    {
+        if($this->getStart_node()->getUid()==$currentEntity->getUid()){
+           $this->setStart_node($newEntity);
+        }elseif($this->getEnd_node()->getUid()==$currentEntity->getUid()){
+            $this->setEnd_node($newEntity);
+        }
+    }
+
     function update()
     {
         if($this->getStart_node()==null||$this->getEnd_node()==null)return false;

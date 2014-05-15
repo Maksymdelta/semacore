@@ -1,0 +1,248 @@
+<include href="'../'.{{ @UI }}.'header.html'" xmlns="http://www.w3.org/1999/html"/>
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#addnew').idealforms();
+        $('.selectpicker').selectpicker();
+
+        $('#doedit').click(function(){
+//            alert($('#addnew').idealforms('is:valid', 'name'));
+            $('#addnew').idealforms('removeFields', 'infobittitle infobit');
+            if($('#addnew').idealforms('get:invalid').length==0)
+            {
+                $( "#addnew" ).submit();
+            }
+            else{
+                $('#addnew').idealforms('focusFirstInvalid');
+            }
+        });
+
+        $('#addinfobit').click(function(){
+            if($('#newinfobitwell').is(':visible')) {
+                if($('#addnew').idealforms('get:invalid').length==0)
+                {
+                    $("#addnew").attr("action", "{{@ALIASES.addinfobittorelationship}}");
+                    $( "#addnew" ).submit();
+                }
+                else{
+                    $('#addnew').idealforms('focusFirstInvalid');
+                }
+            }
+            else{
+                $('#newinfobitwell').toggle('slow');
+                $('#cancelinfobit').toggle('slow');
+            }
+        });
+
+
+        $('#cancelinfobit').click(function(){
+            $('#newinfobitwell').toggle('slow');
+            $('#cancelinfobit').toggle('slow');
+        });
+
+    });
+
+
+    function showDialog(entityid, relationid)
+    {
+        $("#relationdialogid").val(relationid);
+        $("#entitydialogid").val(entityid);
+        $('#typeaheaddialog').val('');
+        $( "#entitydialog" ).modal({
+            minWidth: 350,
+            minHeight: 130,
+            autoResize: true,
+            modal: true,
+            opacity:80,
+            overlayCss: {backgroundColor:"#fff"},
+            containerCss:{
+                backgroundColor:"#F5F5F5",
+                borderColor:"#DDDDDD",
+                padding:20
+            },
+            onShow: function(dialog)
+            {
+                $('#dialogerror').hide();
+                var engine = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: '/manager/entity/'+entityid+'/query/%QUERY.json'
+                });
+                engine.initialize();
+                var typeheaddialog=$('#typeaheaddialog').typeahead({
+                            minLength: 3,
+                            highlight: true
+                        },
+                        {
+                            name: 'dataset',
+                            displayKey: 'name',
+                            source: engine.ttAdapter()
+                        }).on('typeahead:selected', function (obj, datum) {
+                            $("#entitydialogid").val(datum['_id']);
+                        });
+                $('#setentitydialog').click(function(){
+
+                    $.ajax(
+                            {
+                                type: 'POST',
+                                url: "{{@ALIASES.replaceentity}}",
+                                dataType: 'text',
+                                cache: false,
+                                async: false,
+                                data: { entity1: entityid, entity2: $("#entitydialogid").val(), relation:  relationid},
+                                success: function(result)
+                                {
+                                    if(result=='false')
+                                    {
+                                        dialog.container.height(180);
+                                        $('#dialogerror').toggle('fast');
+                                    }
+                                    else{
+                                        $.modal.close();
+                                        location.reload();
+                                    }
+                                },
+                                error: function(){
+                                    dialog.container.height(180);
+                                    $('#dialogerror').toggle('fast');
+
+                                }
+                            });
+                })
+            }
+        });
+    }
+
+    function Msg(relationshipid,infobitid)
+    {
+        var conf=confirm('Ви дійсно хочете видалити цю інформацію?')
+        if(conf==true)
+        {
+            $(location).attr('href',"/manager/relationship/"+relationshipid+"/deleteinfobit/"+infobitid);
+        }
+    }
+</script>
+
+<div id="wrapper">
+    <check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Редагувати зв'язок {{ @relationship->getName() }}</div>
+            <div class="panel-body">
+                <form id="addnew" name="addnew" action="{{@ALIASES.doeditrelationship}}" class="idealforms" method="post">
+                    <div id="relationshipobjects">
+                    <check if="{{ isset(@types) }}">
+                        <div class="field" >
+                            <label for="type">Тип</label>
+                            <select name="type" id="type" class="selectpicker">
+                                <repeat group="{{ @types }}" value="{{ @type }}">
+                                    <option value="{{ @type }}" <check if="{{ isset(@relationship)&&@relationship->getObjType()==@type }}">selected</check>>{{@type}}</option>
+                                </repeat>
+
+                            </select>
+                        </div>
+                    </check>
+                    <check if="{{ @relationship->getStart_node() }}">
+                        <F3:set startEntity="{{@relationship->getStart_node()}}" />
+                        <div class="field"><label>Об'єкт</label><a href="javascript:showDialog('{{ @startEntity->getUid()}}','{{ @relationship->getUid() }}');">{{ @startEntity->getName() }}</a></div>
+                    </check>
+
+                    <check if="{{ @relationship->getEnd_node() }}">
+                        <F3:set endEntity="{{@relationship->getEnd_node()}}" />
+                        <div class="field"><label>Об'єкт</label><a href="javascript:showDialog('{{ @endEntity->getUid()}}','{{ @relationship->getUid() }}');">{{ @endEntity->getName() }}</a></div>
+                    </check>
+                    </div>
+
+
+                <div class="clear">
+
+                    <fieldset class="border">
+                        <legend class="border">Інформація</legend>
+                        <check if="{{ isset(@relationship)&&@relationship->getInfo_bits()!=null}}">
+                            <repeat group="{{ @relationship->getInfo_bits() }}" value="{{ @infobit }}">
+
+                                <table class="infobit">
+                                    <tr>
+                                        <td>
+                                            <div class="field">
+                                                <input type="text" class="form-control" placeholder="Назва" data-idealforms-rules="required" id="infobittitle[{{ @infobit->getUid() }}]" name="infobittitle[{{ @infobit->getUid() }}]" value="{{ @infobit->getKey() }}">
+                                                <span class="error"></span>
+                                                <i class="icon"></i>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <div class="field">
+                                                <textarea data-idealforms-rules="required" id="infobitvalue[{{@infobit->getUid()}}]" name="infobitvalue[{{@infobit->getUid()}}]" placeholder="Текст">{{ @infobit->getValue() }}</textarea>
+                                                <span class="error"></span>
+                                                <i class="icon"></i>
+                                            </div>
+                                        </td>
+                                        <td><a href="javascript:Msg('{{@relationship->getUid()}}','{{@infobit->getUid()}}');"><img src="{{ @BASE }}/{{ @UI}}img/close.png" /></a></td>
+                                    </tr>
+                                </table>
+                            </repeat>
+                        </check>
+
+                        <div id="newinfobitwell" class="well well-lg">
+                            <table id="newinfobit">
+                                <tr>
+                                    <td>
+                                        <div class="field">
+                                            <input type="text" class="form-control" placeholder="Назва" data-idealforms-rules="required" id="infobittitle" name="infobittitle">
+                                            <span class="error"></span>
+                                            <i class="icon"></i>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <div class="field">
+                                            <textarea data-idealforms-rules="required" id="infobit" name="infobit" placeholder="Текст"></textarea>
+                                            <span class="error"></span>
+                                            <i class="icon"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+
+                        <div class="field" id="addinfobitwrap">
+                            <button class="btn btn-default" type="button" id="cancelinfobit" name="cancelinfobit">Відмінити</button>
+                            <button class="btn btn-default" type="button" id="addinfobit" name="addinfobit">Додати</button>
+                        </div>
+                    </fieldset>
+
+
+                </div>
+
+                    <div class="field" id="save">
+                        <input type="hidden" name="uid" id="uid" value="<check if="{{isset(@relationship)}}">{{@relationship->getUid()}}</check>">
+                    <button class="btn btn-default" type="button" id="doedit" name="doedit">Зберегти</button>
+                        </div>
+
+                </form>
+                 </div>
+            </div>
+
+
+
+
+            </div>
+<div id="entitydialog" style="display: none;">
+    <input type="hidden" id="entitydialogid" name="entitydialogid" value=""/>
+    <input type="hidden" id="relationdialogid" name="relationdialogid" value=""/>
+    <input id="typeaheaddialog" class="form-control" type="text" placeholder="Почніть набирати ім'я або назву" />
+    <div id="dialogerror" class="alert alert-danger">Помилка при збережені!<br />Спробуйте ще раз.</div>
+    <div class="buttonstylewrap">
+        <button class="btn btn-default" type="button" id="setentitydialog" name="setentitydialog">Зберегти</button>
+        <button class="btn btn-default simplemodal-close" type="button" id="cancelrelationdialog" name="cancelrelationdialog">Відмінити</button>
+    </div>
+
+</div>
+
+</body>
+</html>

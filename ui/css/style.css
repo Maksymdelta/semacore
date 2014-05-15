@@ -102,3 +102,9 @@ textarea#description{
     width: 150px;
 }
 
+#relationshipobjects{margin-left: 12px;}
+#relationshipobjects label{margin: 0;}
+#relationshipobjects div.field:last-child{margin-bottom: 25px;}
+#relationshipobjects div.field:first-child label{margin-top: 10px;}
+#save{width: 150px;margin:auto;float: none;}
+#save #doedit{width: 150px;margin-top: 20px;}

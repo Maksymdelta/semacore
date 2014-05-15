@@ -100,6 +100,26 @@ class ManagerController extends baseController{
         echo 'false';
     }
 
+    function replaceEntity($f3)
+    {
+        if(!$f3->get('POST.entity1')||!$f3->get('POST.entity2')||!$f3->get('POST.relation'))
+        {
+            echo 'false';
+            return;
+        }
+
+        $currentEnt=new Entity($f3->get('POST.entity1'));
+        $newEnt=new Entity($f3->get('POST.entity2'));
+        $rel=new Relationship($f3->get('POST.relation'));
+        $rel->replaceEntity($currentEnt,$newEnt);
+        if($rel->update())
+        {
+            echo 'success';
+            return;
+        }
+        echo 'false';
+    }
+
     function relationshipSetType($f3)
     {
         if(!$f3->get('POST.type')||!$f3->get('POST.relation'))
@@ -217,6 +237,40 @@ class ManagerController extends baseController{
         $f3->reroute('@list');
     }
 
+
+    function doEditRelationship($f3)
+    {
+        if($f3->get('POST.uid')&&$f3->get('POST.type'))
+        {
+            if(false!=$rel=new Relationship($f3->get('POST.uid')))
+            {
+                $rel->setType($f3->get('POST.type'));
+                if($f3->get('POST.infobittitle')&&$f3->get('POST.infobitvalue'))
+                {
+                    $titles=$f3->get('POST.infobittitle');
+                    $values=$f3->get('POST.infobitvalue');
+                    $infobits=array();
+                    foreach($titles as $uid=>$title)
+                    {
+                        $infbit=new InfoBit($uid);
+                        $infbit->setKey($title);
+                        $infbit->setValue($values[$uid]);
+                        $infbit->save();
+                        $infobits[]=$infbit;
+                    }
+                    $rel->setInfo_bits($infobits);
+                }
+                $rel->update();
+                $f3->reroute('@list');
+            }
+        }
+        if($f3->get('POST.uid')){
+            Flash::setflash('Заповніть будь ласка всі поля!');
+            $f3->reroute('@relationshipedit(@id='.$f3->get('POST.uid').')');
+        }
+        $f3->reroute('@list');
+    }
+
     function deleteInfobitFromEntity($f3)
     {
         if(false!=$ent=new Entity($f3->get('PARAMS.entityid')))
@@ -233,7 +287,47 @@ class ManagerController extends baseController{
 
     function editRelationship($f3)
     {
+        if(!$f3->get('PARAMS.id'))
+        {
+            $f3->reroute('@list');
+        }
+        $rel=new Relationship($f3->get('PARAMS.id'));
+        $f3->set('relationship',$rel);
+        $f3->set('types',EntityType::getTypes());
+        $f3->set('head','../'.$f3->get('UI').'editrelationship_head.html');
+        echo Template::instance($f3)->render('../'.$f3->get('UI').'editrelationship.html');
+    }
 
+    function addInfobitToRelationship($f3)
+    {
+        if($f3->get('POST.uid')&&$f3->get('POST.infobittitle')&&$f3->get('POST.infobit'))
+        {
+            $relationship=new Relationship($f3->get('POST.uid'));
+            $infobit=new InfoBit();
+            $infobit->setKey($f3->get('POST.infobittitle'));
+            $infobit->setValue($f3->get('POST.infobit'));
+            $infobit->save();
+            $relationship->addInfo_bit($infobit);
+            $relationship->save();
+        }
+        $f3->reroute('@relationshipedit(@id='.$f3->get('POST.uid').')');
+    }
+
+    function deleteInfobitFromRelationship($f3)
+    {
+        if($f3->get('PARAMS.relid')&&$f3->get('PARAMS.infobitid'))
+        {
+            if(false!=$rel=new Relationship($f3->get('PARAMS.relid')))
+            {
+                if(false!=$infobit=new InfoBit($f3->get('PARAMS.infobitid')))
+                {
+                    $rel->deleteInfo_bit($infobit);
+                    $rel->save();
+                    $f3->reroute('@relationshipedit(@id='.$f3->get('PARAMS.relid').')');
+                }
+            }
+        }
+        $f3->reroute('@list');
     }
 
     function deleteEntity($f3)
