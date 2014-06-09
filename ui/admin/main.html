@@ -6,11 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Semasearch Admin</title>
 
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{@BASE}}/{{@UI}}admin/static/css/admin.css">
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{@BASE}}/{{@UI}}css/style.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
   <!-- @TODO move all scripts to bootom of page -->
 </head>
+
+<link rel="stylesheet" href="{{ @BASE }}/{{ @UI}}css/jquery.idealforms.css" type="text/css" media="screen" />
+<script src="{{ @BASE }}/{{ @UI}}js/jquery.idealforms.min.js"></script>
+<script src="{{ @BASE }}/{{ @UI}}js/jquery.idealforms.i18n.uk.js"></script>
+<link rel="stylesheet" href="{{@BASE}}/{{@UI}}css/bootstrap-select.css">
+<script src="{{@BASE}}/{{@UI}}js/bootstrap-select.min.js"></script>
+
 <body>
 
   <div class="container">
@@ -24,9 +35,7 @@
       </div>
     </div>
   </div><!-- /.container -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
   <script src="{{@BASE}}/{{@UI}}admin/static/vendor/js/handlebars.js"></script>
-  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   <script src="{{@BASE}}/{{@UI}}admin/static/js/admin.js"></script>
   <script>$(init);</script>
 </body>

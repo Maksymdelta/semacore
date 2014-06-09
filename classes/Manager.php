@@ -14,7 +14,10 @@ class Manager implements MongoMappable
 	private $Last_login_date;
 	private $Registered_at;
     private $MongoMapper;
-
+	private $Contacts;
+	private $Description;
+	private $Password;
+	
 	/**
 	 * 
 	 * @param id
@@ -34,6 +37,11 @@ class Manager implements MongoMappable
         $mapper->attach($this->Registered_at,'registered_at');
         $mapper->attach($this->Last_login_date,'last_login_date');
         $mapper->attach($this->Name,'name');
+        $mapper->attach($this->Password,'password');
+		$mapper->attach($this->Contacts,'contacts');
+        $mapper->attach($this->Description,'description');
+
+				
     }
 
     function delete()
@@ -78,7 +86,38 @@ class Manager implements MongoMappable
 	{
 		$this->Email = $email;
 	}
+	
+	public function getPassword() 
+	{
+		return $this->Password;
+	}
 
+	public function setPassword($password)
+	{
+		$this->Password = $password;
+	}
+	
+	
+	public function setContacts($contacts)
+	{
+		$this->Contacts = $contacts;
+	}
+	
+	public function getContacts()
+	{
+		return $this->Contacts;
+	}
+	
+	public function setDescription($description)
+	{
+		$this->Description = $description;
+	}
+	
+	public function getDescription()
+	{
+		return $this->Description;
+	}
+	
 	public function getName()
 	{
 		return $this->Name;

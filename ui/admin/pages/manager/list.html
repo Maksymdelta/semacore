@@ -1,6 +1,9 @@
+<check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+
 <div class="panel panel-default">
   <div class="panel-heading">
-    <button id="add-manager-btn" type="button" class="btn btn-primary pull-left">Додати</button>
+	<a href="{{@ALIASES.manageradd}}">
+    <button id="add-manager-btn" type="button" class="btn btn-primary pull-left">Додати</button> </a>
     <div class="col-md-4">
       <div class="input-group">
         <input type="text" class="form-control">
@@ -12,6 +15,7 @@
     <div class="clearfix"></div>
   </div>
   <div class="panel-body">
+    
     <table id="managers-grid" class="managers-grid table table-hover">
       <thead>
         <tr>
@@ -48,54 +52,3 @@
     </table>
   </div>
 </div>
-
-<handlebars id="managers-add-dialog">
-  <div class="modal fade">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Новий менеджер</h4>
-        </div>
-        <div class="modal-body">
-
-
-          <form class="form-horizontal" role="form">
-            <div class="form-group">
-              <label for="mg-d-email" class="col-sm-2 control-label">Е-мейл</label>
-              <div class="col-sm-10">
-                <input type="email" class="form-control" id="mg-d-email" placeholder="Е-мейл" value="{{email}}">
-              </div>
-            </div>
-            {{#unless edit}}
-            <div class="form-group">
-              <label for="mg-d-password" class="col-sm-2 control-label">Пароль</label>
-              <div class="col-sm-10">
-                <input type="password" class="form-control" id="mg-d-password" placeholder="Пароль">
-              </div>
-            </div>
-            {{/unless}}
-            <div class="form-group">
-              <label for="mg-d-contacts" class="col-sm-2 control-label">Контакти</label>
-              <div class="col-sm-10">
-                <input class="form-control" id="mg-d-contacts" placeholder="Контакти" value="{{contacts}}">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="mg-d-description" class="col-sm-2 control-label">Опис</label>
-              <div class="col-sm-10">
-                <textarea class="form-control" id="mg-d-description" placeholder="Опис">{{description}}</textarea>
-              </div>
-            </div>
-          </form>
-
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Відміна</button>
-          <button type="button" class="btn btn-primary">Зберегти</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</handlebars>

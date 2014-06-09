@@ -1,0 +1,66 @@
+﻿<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#addnewmanager').idealforms();
+
+		$('#add').click(function(){
+
+            if($('#addnewmanager').idealforms('get:invalid').length==0)
+            {
+                $( "#addnewmanager" ).submit();
+            }
+            else{
+                $('#addnewmanager').idealforms('focusFirstInvalid');
+            }
+        });
+
+    });
+</script>
+
+
+<div id="wrapper">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Новий менеджер</h4>
+        </div>
+        <div class="panel-body">
+
+		<check if="{{ isset(@flash) }}"><div class="alert alert-danger">{{ @flash.message }}</div></check>
+
+		  <form id="addnewmanager" name="addnewmanager" action="{{@ALIASES.doaddmanager}}" class="idealforms" method="post">
+            <div class="form-group">
+              <label for="mg-d-email" class="col-sm-2 control-label">Е-мейл*</label>
+              <div class="col-sm-10">
+                <input type="email" class="form-control" id="mg-d-email" name="mg-d-email" placeholder="Е-мейл" value="<check if="{{ isset(@manager)}}">{{ @manager->getEmail() }}</check>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mg-d-password" class="col-sm-2 control-label">Пароль*</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="mg-d-password"  name="mg-d-password" placeholder="Пароль">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mg-d-contacts" class="col-sm-2 control-label">Контакти*</label>
+              <div class="col-sm-10">
+                <input class="form-control" id="mg-d-contacts" name="mg-d-contacts" placeholder="Контакти" value="<check if="{{ isset(@manager)}}">{{ @manager->getContacts() }}</check>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mg-d-description" class="col-sm-2 control-label">Деталі</label>
+              <div class="col-sm-10">
+                <textarea class="form-control" id="mg-d-description" name="mg-d-description" placeholder="Деталі"><check if="{{ isset(@manager)}}">{{ @manager->getDescription() }}</check></textarea>
+              </div>
+            </div>
+			
+			<div class="field">
+			  <button id="add" name="add" type="button" class="btn btn-default">Зберегти</button>
+			</div>
+          </form>
+
+
+        </div>
+        
+    </div>
+</div>
