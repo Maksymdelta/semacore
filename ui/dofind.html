@@ -1,0 +1,121 @@
+<include href="'../'.{{ @UI }}.'header.html'" />
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<style>
+
+    .link {
+        fill: none;
+        stroke: #D0D0D0;
+        stroke-width: 1px;
+    }
+
+    #licensing {
+        fill: red;
+    }
+
+    .link.licensing {
+        stroke: red;
+    }
+
+    .link.resolved {
+        stroke-dasharray: 0,2 1;
+        stroke: orange;
+    }
+
+    circle {
+        fill: mediumseagreen;
+        stroke: #fff;
+        stroke-width: 1px;
+    }
+
+    text {
+        fill: #666;
+        font: 14px sans-serif;
+        cursor: pointer;
+        pointer-events: all;
+    }
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+
+        var links ={{@result|raw}};
+        var nodes = {};
+
+        links.forEach(function(link) {
+            link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+            link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+
+        });
+
+        var width = 1200,
+                height = 650;
+
+        var force = d3.layout.force()
+                .nodes(d3.values(nodes))
+                .links(links)
+                .size([width, height])
+                .linkDistance(60)
+                .charge(-500)
+                .on("tick", tick)
+                .start();
+        //console.log(d3.values(nodes));
+
+        var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+        // Per-type markers, as they don't inherit styles.
+        svg.append("defs").selectAll("marker")
+                .data(["suit", "licensing", "resolved"])
+                .enter().append("marker")
+                .attr("id", function(d) { return d; })
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 32)
+                .attr("refY", -3)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5");
+
+        var path = svg.append("g").selectAll("path")
+                .data(force.links())
+                .enter().append("path")
+                .attr("class", function(d) { return "link " + d.type; })
+                .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+        var circle = svg.append("g").selectAll("circle")
+                .data(force.nodes())
+                .enter().append("circle")
+                .attr("r", 15)
+                .on("mouseover", function(){d3.select(this).style("fill", "orange");})
+                .on("mouseout", function(){d3.select(this).style("fill", "mediumseagreen");})
+                .call(force.drag);
+
+        var text = svg.append("g").selectAll("text")
+                .data(force.nodes())
+                .enter().append("text")
+                .attr("x", 30)
+                .attr("y", ".55em")
+                .text(function(d) { return d.name; });
+
+        // Use elliptical arc path segments to doubly-encode directionality.
+        function tick() {
+            path.attr("d", linkArc);
+            circle.attr("transform", transform);
+            text.attr("transform", transform);
+        }
+
+        function linkArc(d) {
+            var dx = d.target.x - d.source.x,
+                    dy = d.target.y - d.source.y,
+                    dr = Math.sqrt(dx * dx + dy * dy);
+            return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+        }
+
+        function transform(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        }
+
+</script>

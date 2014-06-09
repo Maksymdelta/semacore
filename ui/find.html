@@ -1,0 +1,32 @@
+<include href="'../'.{{ @UI }}.'header.html'" />
+<include href="'../'.'/'.{{ @UI }}.'topmenu.html'" />
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#findbtn').click(function(){
+            $( "#find" ).submit();
+        });
+
+    });
+</script>
+<div id="wrapper">
+    <form id="find" name="addnew" action="{{@ALIASES.dofind}}" method="post">
+        <div class="panel panel-default">
+            <div class="panel-heading">Шукати зв'язки</div>
+            <div class="panel-body">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input type="text" name="names" id="names" class="form-control" placeholder="Імена двух об'єктів через кому">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" id="findbtn" name="findbtn">Шукати</button>
+      </span>
+                    </div><!-- /input-group -->
+                </div><!-- /.col-lg-6 -->
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+</body>
+</html>

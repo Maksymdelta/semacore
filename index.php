@@ -6,7 +6,7 @@ $f3->set('DEBUG',3);
 if ((float)PCRE_VERSION<7.9)
  trigger_error('PCRE version is out of date');
 $f3->set('AUTOLOAD','classes/;controllers/;lib');
-$f3->set('CACHE', true);
+$f3->set('CACHE', false); // was true
 require('lib/vendor/autoload.php');
 $f3->config('config.ini');
 
@@ -39,9 +39,16 @@ $f3->route('GET /manager/entity/@entityid/deleterelation/@id','ManagerController
 $f3->route('POST @doaddentity: /manager/entity/add','ManagerController->doAddEntity');
 
 // Admin routes
-$f3->route('GET @admin_managers_list: /admin/managers','Admin\Controller\Manager->listAll');
-$f3->route('GET @admin_managers_show: /admin/managers/@managerID','Admin\Controller\Manager->show');
+$f3->route('GET @manageradd: /admin/managers/add','AdminManager->addManager');
+$f3->route('POST @doaddmanager: /admin/managers/add','AdminManager->doAddManager');
+$f3->route('GET @manageredit: /admin/manager/@id','AdminManager->editManager');
+$f3->route('POST @domanageredit: /admin/managers/edit','AdminManager->doEditManager');
 
 
+$f3->route('GET @admin_managers_list: /admin/managers','AdminManager->listAll');
+$f3->route('GET @admin_managers_show: /admin/managers/@managerID','AdminManager->show');
+
+$f3->route('GET @find: /admin/find','SearchController->find');
+$f3->route('POST @dofind: /admin/find','SearchController->doFind');
 
 $f3->run();
