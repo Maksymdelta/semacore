@@ -7,7 +7,7 @@ class ManagerController extends baseController{
         $options=array('limit'=>1000, 'order'=>array('created_at'=>1));
         if($request=$f3->get('SESSION.request'))
         {
-            $result=MongoSearch::getInstance()->search(array(new Entity(),new Relationship()),array('name'=>array('$in'=>[new \MongoRegex('/'.$request.'/i'),'$exists'=>true])),$options);
+            $result=MongoSearch::getInstance()->search(array(new Entity(),new Relationship()),array('name'=>array('$in'=>array_values([new \MongoRegex('/'.$request.'/i'),'$exists'=>true]))),$options);
 
         }
         else{
@@ -142,7 +142,7 @@ class ManagerController extends baseController{
         }
         $f3->get('PARAMS.entityid')?$entid=$f3->get('PARAMS.entityid'):$entid=null;
         $options=array('limit'=>50, 'order'=>array('created_at'=>1));
-        if(false!=$result=MongoSearch::getInstance()->ajaxSearch($entid,new Entity(),array('name'=>array('$in'=>[new \MongoRegex('/'.$f3->get('PARAMS.query').'/i'),'$exists'=>true])),$options))
+        if(false!=$result=MongoSearch::getInstance()->ajaxSearch($entid,new Entity(),array('name'=>array('$in'=>array_values([new \MongoRegex('/'.$f3->get('PARAMS.query').'/i'),'$exists'=>true]))),$options))
             echo json_encode($result);
         else
             echo json_encode('false');
